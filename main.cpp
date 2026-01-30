@@ -2,6 +2,10 @@
 #include <vector>
 #include <random>
 #include <iostream>
+#include <Windows.h>
+#include <chrono>
+#include "Snake.h"
+
 void PlaceFood(std::vector<std::vector<int>> &grid) 
 {
 	std::random_device rd;
@@ -11,25 +15,48 @@ void PlaceFood(std::vector<std::vector<int>> &grid)
 
 	int x = distx(gen);
 	int y = disty(gen);
-	grid[y][x] = 1;
+	grid[y][x] = 2;
 }
 
-void drawGrid(std::vector<std::vector<int>> grid)
+/*void DrawGrid(std::vector<std::vector<int>> grid, Snake s)
 {
-	for (const auto row : grid)
+	for (int i = 0; i < grid.size(); i++)
 	{
-		for (const auto col : row) \
+		for (int j = 0; j < grid[0].size(); j++)
 		{
-			std::cout << col << " ";
+			if (s.x == j && s.y == i)
+				std::cout << 1 << " ";
+			else
+				std::cout << grid[i][j] << " ";
 		}
 		std::cout << std::endl;
 	}
 }
+*/
+void clearScreen() {
+	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	CONSOLE_SCREEN_BUFFER_INFO csbi;
+	DWORD count;
+	DWORD cellCount;
 
-int main() 
+	if (!GetConsoleScreenBufferInfo(hConsole, &csbi)) return;
+
+	cellCount = csbi.dwSize.X * csbi.dwSize.Y;
+
+	FillConsoleOutputCharacter(hConsole, ' ', cellCount, { 0, 0 }, &count);
+	FillConsoleOutputAttribute(hConsole, csbi.wAttributes, cellCount, { 0, 0 }, &count);
+	SetConsoleCursorPosition(hConsole, { 0, 0 });
+}
+
+int main()
 {
-	std::vector<std::vector<int>> grid(5, std::vector<int>(3, 0));
-	PlaceFood(grid);
-	drawGrid(grid);
+	std::vector<Direction> movements = {Direction::left, Direction::left, Direction::left, Direction::right};
+	Snake newSnake;
+	for (Direction d : movements) 
+	{
+		newSnake.PrintSnake();
+		newSnake.ChangeDirection(d);
+	}
+	//SDL_Quit();
 }
 
